@@ -1,5 +1,6 @@
 package com.example.geoquiztrue;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String KEY_INDEX = "index";
 
     Button btnTrue;
     Button btnFalse;
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         questionTextView = (TextView) findViewById(R.id.questionTextView);
         int question = mQuestionBank[mCurrentIndex].getTextResId();
@@ -82,6 +86,9 @@ public class MainActivity extends AppCompatActivity {
             messsageResId = R.string.incorrect_toast;
         }
         Toast.makeText(this, messsageResId, Toast.LENGTH_SHORT).show();
+        //Проверка ответа
     }
+
+
 
 }
