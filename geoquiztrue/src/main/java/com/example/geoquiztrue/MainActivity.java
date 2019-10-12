@@ -60,10 +60,8 @@ public class MainActivity extends AppCompatActivity {
         updateQuestion();
     }
 
-    public void BackQuestion(View view){
-        //mCurrentIndex = (mCurrentIndex - 1) % mQuestionBank.length;
-        //updateQuestion();
-        mCurrentIndex= ( mCurrentIndex - 1 + mQuestionBank.length)% mQuestionBank.length;
+    public void BackQuestion(View view) {
+        mCurrentIndex = (mCurrentIndex - 1 + mQuestionBank.length) % mQuestionBank.length;
         updateQuestion();
     }
 
