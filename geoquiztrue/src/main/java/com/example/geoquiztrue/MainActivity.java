@@ -3,6 +3,7 @@ package com.example.geoquiztrue;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnTrue;
     Button btnFalse;
     Button btnNext;
+    Button btnCheat;
     TextView questionTextView;
 
     private Question[] mQuestionBank = new Question[]{ //Масивчики, полезная вешь
@@ -42,6 +44,16 @@ public class MainActivity extends AppCompatActivity {
         btnTrue = (Button) findViewById(R.id.btnTrue);
         btnFalse = (Button) findViewById(R.id.btnFalse);
         btnNext = (Button) findViewById(R.id.btnNext);
+
+        btnCheat =(Button) findViewById(R.id.btnCheat);
+        btnCheat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
+                Intent intent = CheatActivity.newIntent(MainActivity.this, answerIsTrue);
+                startActivity(intent);
+            }//переход на новую активность с ответом
+        });
 
         updateQuestion();
 
