@@ -3,8 +3,10 @@ package com.example.geoquiztrue;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +16,11 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private static final String KEY_INDEX = "index";
+    private static final int REQUEST_CODE_CHEAT = 0;
+    private static final String QUESTION_INDEX_KEY ="Key";
+    private static final String QUESTIONS_ANSWERED_KEY ="key2";
+
+    private int correctAnswers = 0;
 
     Button btnTrue;
     Button btnFalse;
@@ -30,11 +37,21 @@ public class MainActivity extends AppCompatActivity {
             new Question(R.string.question_asia, true),
     };
     private int mCurrentIndex = 0;
+    private boolean mIsCheater;
+
+    private boolean[] mQuestionsAnswered = new boolean[mQuestionBank.length];
+    private String TAG;
+    //логического массив, чтобы отслеживать, на какие вопросы были даны ответы:
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState != null) {
+            mCurrentIndex = savedInstanceState.getInt(QUESTION_INDEX_KEY);
+            mQuestionsAnswered = savedInstanceState.getBooleanArray(QUESTIONS_ANSWERED_KEY);
+        }//восстановление данных внутри
 
 
         questionTextView = (TextView) findViewById(R.id.questionTextView);
@@ -45,13 +62,13 @@ public class MainActivity extends AppCompatActivity {
         btnFalse = (Button) findViewById(R.id.btnFalse);
         btnNext = (Button) findViewById(R.id.btnNext);
 
-        btnCheat =(Button) findViewById(R.id.btnCheat);
+        btnCheat = (Button) findViewById(R.id.btnCheat);
         btnCheat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
                 Intent intent = CheatActivity.newIntent(MainActivity.this, answerIsTrue);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE_CHEAT);
             }//переход на новую активность с ответом
         });
 
@@ -59,6 +76,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != Activity.RESULT_OK) {
+            return;
+        }
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            if (data == null) {
+                return;
+            }
+            mIsCheater = CheatActivity.wasAnswerShow(data);
+        }
+    }
 
     public void ShowToastOne(View view) {
         checkAnswer(true);
@@ -73,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void NextQuestion(View view) {
         mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
+        mIsCheater = false;
         updateQuestion();
     }
 
@@ -83,24 +114,75 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void updateQuestion() {
+        btnTrue.setEnabled(!mQuestionsAnswered[mCurrentIndex]);
+        btnFalse.setEnabled(!mQuestionsAnswered[mCurrentIndex]);//проверка ответа
+
         int question = mQuestionBank[mCurrentIndex].getTextResId();
         questionTextView.setText(question);
     }
 
     private void checkAnswer(boolean userPressedTrue) {
+        mQuestionsAnswered[mCurrentIndex] = true;
+        //setButtonsEnabled(false);
+
+        btnTrue.setEnabled(false);
+        btnFalse.setEnabled(false);//проверка ответа
+
+        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
+
+        int messageResId;
+
+        if (userPressedTrue == answerIsTrue) {
+            messageResId = R.string.correct_toast;
+            correctAnswers++;
+        } else {
+            messageResId = R.string.incorrect_toast;
+        }
+
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+        calculateScore();
+    }
+
+    /*private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
 
         int messsageResId = 0;
 
-        if (userPressedTrue == answerIsTrue) {
-            messsageResId = R.string.correct_toast;
+        mQuestionsAnswered[mCurrentIndex] = true;
+
+        btnTrue.setEnabled(false);
+        btnFalse.setEnabled(false);//проверка ответа
+
+        if (mIsCheater) {
+            messsageResId = R.string.judgment_toast;
         } else {
-            messsageResId = R.string.incorrect_toast;
+            if (userPressedTrue == answerIsTrue) {
+                messsageResId = R.string.correct_toast;
+            } else {
+                messsageResId = R.string.incorrect_toast;
+            }
         }
         Toast.makeText(this, messsageResId, Toast.LENGTH_SHORT).show();
-        //Проверка ответа
+    }*/ //первоначальный вариант
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState() called");
+        outState.putInt(QUESTION_INDEX_KEY, mCurrentIndex);
+        outState.putBooleanArray(QUESTIONS_ANSWERED_KEY, mQuestionsAnswered);
     }
 
+    private void calculateScore() {
+        // check all questions answered
+        for (boolean answered : mQuestionsAnswered) {
+            if (!answered) return;
+        }
+        // all answered, show message
+        int score = correctAnswers * 100 / mQuestionBank.length;
+        String message = getString(R.string.toast_score, score);
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
 
 
 }
