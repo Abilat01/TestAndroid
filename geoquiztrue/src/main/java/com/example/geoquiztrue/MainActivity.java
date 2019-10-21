@@ -1,13 +1,18 @@
 package com.example.geoquiztrue;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String KEY_INDEX = "index";
     private static final int REQUEST_CODE_CHEAT = 0;
-    private static final String QUESTION_INDEX_KEY ="Key";
-    private static final String QUESTIONS_ANSWERED_KEY ="key2";
+    private static final String QUESTION_INDEX_KEY = "Key";
+    private static final String QUESTIONS_ANSWERED_KEY = "key2";
 
     private int correctAnswers = 0;
 
@@ -182,6 +187,51 @@ public class MainActivity extends AppCompatActivity {
         int score = correctAnswers * 100 / mQuestionBank.length;
         String message = getString(R.string.toast_score, score);
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, 1, 1, "Выход");
+        //1 пункт хз зачем, 2 это id. 3 это номер позиции
+
+        return super.onCreateOptionsMenu(menu);
+
+    }
+
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+
+            case 1: {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                builder.setTitle("Вы уверенны?")
+                        .setMessage("")
+                        .setCancelable(true)
+                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(getApplicationContext(), "Попробуем еще раз!",
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        })
+                        .setPositiveButton("Мне пора", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                finish();
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+
+                break;
+            }
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 
