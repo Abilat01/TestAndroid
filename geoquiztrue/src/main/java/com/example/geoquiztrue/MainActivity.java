@@ -148,27 +148,6 @@ public class MainActivity extends AppCompatActivity {
         calculateScore();
     }
 
-    /*private void checkAnswer(boolean userPressedTrue) {
-        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
-
-        int messsageResId = 0;
-
-        mQuestionsAnswered[mCurrentIndex] = true;
-
-        btnTrue.setEnabled(false);
-        btnFalse.setEnabled(false);//проверка ответа
-
-        if (mIsCheater) {
-            messsageResId = R.string.judgment_toast;
-        } else {
-            if (userPressedTrue == answerIsTrue) {
-                messsageResId = R.string.correct_toast;
-            } else {
-                messsageResId = R.string.incorrect_toast;
-            }
-        }
-        Toast.makeText(this, messsageResId, Toast.LENGTH_SHORT).show();
-    }*/ //первоначальный вариант
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -223,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                 AlertDialog alert = builder.create();
-                alert.show();
+                alert.show();//реализация выхода
 
 
                 break;
